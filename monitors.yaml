@@ -1,0 +1,18 @@
+monitors:
+  - title: Daily High-Value Transactions
+    sql: "SELECT * FROM transactions WHERE transaction_amount > 300 AND DATE(transaction_date) = DATE(:date)"
+    frequency: daily
+    channel: JIRA
+    notify: fraud_team
+
+  - title: Monthly Spending Deviation
+    sql: "SELECT account_id, SUM(transaction_amount) as total FROM transactions GROUP BY account_id HAVING total > (SELECT AVG(transaction_amount) * 1.5 FROM transactions)"
+    frequency: monthly
+    channel: email
+    notify: fraud_team
+
+  - title: Monthly High-Spending Accounts
+    sql: "SELECT account_id, SUM(transaction_amount) as total FROM transactions WHERE DATE(transaction_date) BETWEEN DATE(:start_date) AND DATE(:end_date) GROUP BY account_id HAVING total > 500"
+    frequency: monthly
+    channel: slack
+    notify: fraud_team
